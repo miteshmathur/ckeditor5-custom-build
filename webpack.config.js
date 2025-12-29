@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 'use strict';
 
 const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { styles } = require('@ckeditor/ckeditor5-dev-utils');
 const TerserPlugin = require('terser-webpack-plugin');
 
@@ -11,7 +11,7 @@ module.exports = {
     entry: path.resolve(__dirname, 'src/ckeditor.js'),
 
     output: {
-        path: path.resolve(__dirname, 'dist/ckeditor5_36.0.1'),
+        path: path.resolve(__dirname, 'dist/ckeditor5'),
         filename: 'ckeditor.js',
         library: 'ClassicEditor',
         libraryTarget: 'umd',
@@ -40,28 +40,15 @@ module.exports = {
 
     module: {
         rules: [
-            // CKEditor SVG icons → raw strings (CSP-safe)
             {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
                 use: ['raw-loader']
             },
-
-            // CKEditor theme CSS
             {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
                 use: [
-                    {
-                        loader: 'style-loader',
-                        options: {
-                            injectType: 'singletonStyleTag',
-                            attributes: {
-                                'data-cke': true
-                            }
-                        }
-                    },
-                    {
-                        loader: 'css-loader'
-                    },
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
                     {
                         loader: 'postcss-loader',
                         options: {
@@ -74,21 +61,18 @@ module.exports = {
                         }
                     }
                 ]
-            },
-
-            // Other SVGs (if any)
-            {
-                test: /\.svg$/,
-                type: 'asset/resource'
             }
         ]
     },
 
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: 'styles.css'
+        })
+    ],
+
     resolve: {
-        extensions: ['.js'],
-        alias: {
-            '@ckeditor': path.resolve(__dirname, 'node_modules', '@ckeditor')
-        }
+        extensions: ['.js']
     },
 
     ignoreWarnings: [/postcss-nesting/]
