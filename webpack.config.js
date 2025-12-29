@@ -2,7 +2,6 @@
 
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { styles } = require('@ckeditor/ckeditor5-dev-utils');
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
@@ -40,24 +39,35 @@ module.exports = {
 
     module: {
         rules: [
+            // CKEditor SVG icons → raw strings
             {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
                 use: ['raw-loader']
             },
+
+            // CKEditor theme CSS → extracted file
             {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
                 use: [
                     MiniCssExtractPlugin.loader,
-                    'css-loader',
+                    {
+                        loader: 'css-loader',
+                        options: { importLoaders: 1 }
+                    },
                     {
                         loader: 'postcss-loader',
                         options: {
-                            postcssOptions: styles.getPostCssConfig({
-                                themeImporter: {
-                                    themePath: require.resolve('@ckeditor/ckeditor5-theme-lark')
-                                },
-                                minify: true
-                            })
+                            postcssOptions: {
+                                plugins: [
+                                    require('postcss-import'),
+                                    require('postcss-preset-env')({
+                                        stage: 3
+                                    }),
+                                    require('cssnano')({
+                                        preset: 'default'
+                                    })
+                                ]
+                            }
                         }
                     }
                 ]
@@ -73,7 +83,5 @@ module.exports = {
 
     resolve: {
         extensions: ['.js']
-    },
-
-    ignoreWarnings: [/postcss-nesting/]
+    }
 };

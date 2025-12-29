@@ -23,11 +23,14 @@
         "@ckeditor/ckeditor5-theme-lark": "^36.0.1"
     },
     "devDependencies": {
-        "@ckeditor/ckeditor5-dev-utils": "^53.4.0",
         "css-loader": "^7.1.2",
+        "cssnano": "^7.1.2",
         "file-loader": "^6.2.0",
         "mini-css-extract-plugin": "^2.9.4",
+        "postcss": "^8.5.6",
+        "postcss-import": "^16.1.1",
         "postcss-loader": "^8.2.0",
+        "postcss-preset-env": "^10.6.0",
         "raw-loader": "^4.0.2",
         "style-loader": "^4.0.0",
         "terser-webpack-plugin": "^5.3.16",
